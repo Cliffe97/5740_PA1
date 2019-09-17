@@ -1,4 +1,7 @@
-def function():
-    print("hi")
+def main():
+    traint = open("truthful.txt",'r');
+    triand = open("deceptive.txt", 'r');
 
-function()
+    a[] = traint.split()
+
+main()
