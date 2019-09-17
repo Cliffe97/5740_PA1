@@ -1,2 +1,4 @@
-def function
-    ffff
+def function():
+    print("hi")
+
+function()
