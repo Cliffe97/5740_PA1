@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c5a8aa16-a5f7-4b9d-970e-a1795a723f93" name="Default Changelist" comment="test!!!!!!">
-      <change afterPath="$PROJECT_DIR$/test2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/5740_PA1.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/5740_PA1.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test2.py" beforeDir="false" afterPath="$PROJECT_DIR$/test2.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -42,7 +40,28 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.test2">
+    <configuration name="test2" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="5740_PA1" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test2.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="test!!" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="5740_PA1" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -66,6 +85,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.test2" />
         <item itemvalue="Python.test!!" />
       </list>
     </recent_temporary>
@@ -102,7 +122,28 @@
       <option name="project" value="LOCAL" />
       <updated>1568754668210</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="additional test file">
+      <created>1568756882212</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1568756882212</updated>
+    </task>
+    <task id="LOCAL-00005" summary="test!!!!!!">
+      <created>1568756933467</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1568756933467</updated>
+    </task>
+    <task id="LOCAL-00006" summary="test!!!!!!">
+      <created>1568756960870</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1568756960870</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -121,6 +162,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="test" />
     <MESSAGE value="test!!!" />
+    <MESSAGE value="additional test file" />
     <MESSAGE value="test!!!!!!" />
     <option name="LAST_COMMIT_MESSAGE" value="test!!!!!!" />
   </component>
