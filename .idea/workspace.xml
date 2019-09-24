@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c5a8aa16-a5f7-4b9d-970e-a1795a723f93" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/5740_PA1.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/5740_PA1.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/langaugeModel.py" beforeDir="false" afterPath="$PROJECT_DIR$/langaugeModel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test!!.py" beforeDir="false" afterPath="$PROJECT_DIR$/test!!.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -112,8 +109,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.langaugeModel" />
-        <item itemvalue="Python.test!!" />
         <item itemvalue="Python.test2" />
+        <item itemvalue="Python.test!!" />
       </list>
     </recent_temporary>
   </component>
@@ -177,7 +174,21 @@
       <option name="project" value="LOCAL" />
       <updated>1568757233473</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="implementation of uni and bigram">
+      <created>1568760550270</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1568760550270</updated>
+    </task>
+    <task id="LOCAL-00009" summary="addk smoothing">
+      <created>1569365559583</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1569365559583</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -199,6 +210,8 @@
     <MESSAGE value="additional test file" />
     <MESSAGE value="test!!!!!!" />
     <MESSAGE value="create languageModel" />
-    <option name="LAST_COMMIT_MESSAGE" value="create languageModel" />
+    <MESSAGE value="implementation of uni and bigram" />
+    <MESSAGE value="addk smoothing" />
+    <option name="LAST_COMMIT_MESSAGE" value="addk smoothing" />
   </component>
 </project>
