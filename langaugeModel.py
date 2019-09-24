@@ -35,6 +35,24 @@ class Bigram:
             prev = word
         return 2 ** prob
 
+    def test_with_addK(self, k, review):
+        prob = 0
+        prev = '.'
+        for word in review:
+            if word not in self.dict1:
+                word = '/unk'
+            if prev not in self.dict1:
+                prev = '/unk'
+
+            if prev + word in self.dict2:
+                # print(prev + word)
+                prob += math.log((self.dict2[prev + word] + k) / (self.dict1[word] + k * len(self.dict1)), 2)
+            else:
+                prob += math.log(k / (self.dict1[word] + k * len(self.dict1)), 2)
+            prev = word
+
+        return 2 ** prob
+
 class Unigram:
     def __init__(self,file):
         self.dictionary = dict()
