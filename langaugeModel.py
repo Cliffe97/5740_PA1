@@ -6,40 +6,35 @@ from utils import preprocess
 
 class Bigram:
     def __init__(self):
-        self.dict1 = dict()
-        self.dict2 = dict()
+        self.uni_dict = dict()
+        self.bi_dict = dict()
         self.count = 0
 
     def train(self, reviews):
         for review in reviews:
-            prev = '.'
+            prev=None
             for word in review:
-                if word in self.dict1:
-                    self.dict1[word] += 1
-                else:
-                    self.dict1[word] = 1
+                self.uni_dict[word] = self.uni_dict.get(word, 0) + 1
+                if prev is not None:
+                    self.bi_dict[(prev, word)] = self.bi_dict.get((prev, word), 0) + 1
 
-                if prev + word in self.dict2:
-                    self.dict2[prev + word] += 1
-                else:
-                    self.dict2[prev + word] = 1
                 prev = word
 
     def train_with_first_OOV(self, reviews):
-        self.dict1['/unk'] = 0
+        self.uni_dict['/unk'] = 0
         for review in reviews:
             prev = '.'
             for word in review:
-                if word in self.dict1:
-                    self.dict1[word] += 1
+                if word in self.uni_dict:
+                    self.uni_dict[word] += 1
                 else:
-                    self.dict1[word] = 0
-                    self.dict1['/unk'] += 1
+                    self.uni_dict[word] = 0
+                    self.uni_dict['/unk'] += 1
 
-                if prev + word in self.dict2:
-                    self.dict2[prev + word] += 1
+                if prev + word in self.bi_dict:
+                    self.bi_dict[prev + word] += 1
                 else:
-                    self.dict2[prev + word] = 1
+                    self.bi_dict[prev + word] = 1
                 prev = word
 
     def train_with_topM(self, reviews, M):
@@ -47,39 +42,39 @@ class Bigram:
             for word in review:
                 self.count += 1
                 word = word.lower()
-                if word in self.dict1:
-                    self.dict1[word] += 1
+                if word in self.uni_dict:
+                    self.uni_dict[word] += 1
                 else:
-                    self.dict1[word] = 1
+                    self.uni_dict[word] = 1
 
         # select top M items to remain in word dictionary
-        items = sorted(self.dict1.items(), key=operator.itemgetter(1))
+        items = sorted(self.uni_dict.items(), key=operator.itemgetter(1))
         disposed = items[M:]
-        self.dict1['/unk'] = 0
+        self.uni_dict['/unk'] = 0
         for key, value in disposed:
-            self.dict1['/unk'] += value
-            del self.dict1[key]
+            self.uni_dict['/unk'] += value
+            del self.uni_dict[key]
 
         # train bi-gram with '/unk' tag
         for review in reviews:
             prev = '.'
             for word in review:
-                if word not in self.dict1:
+                if word not in self.uni_dict:
                     word = '/unk'
-                if prev not in self.dict1:
+                if prev not in self.uni_dict:
                     prev = '/unk'
 
-                if prev + word in self.dict2:
-                    self.dict2[prev + word] += 1
+                if prev + word in self.bi_dict:
+                    self.bi_dict[prev + word] += 1
                 else:
-                    self.dict2[prev + word] = 1
+                    self.bi_dict[prev + word] = 1
                 prev = word
 
 
     def test_corpus(self, reviews, k):
         res = []
         for review in reviews:
-            res.append(self.test_with_addK(k, review))
+            res.append(self.test_with_Ksmoothing(k, review))
         return res
 
 
@@ -87,31 +82,31 @@ class Bigram:
         prob = 0
         prev = '.'
         for word in review:
-            if prev+word in self.dict2:
+            if prev+word in self.bi_dict:
                 # print(prev+word)
-                prob += math.log(self.dict2[prev+word] / self.dict1[word], 2)
+                prob += math.log(self.bi_dict[prev + word] / self.uni_dict[word], 2)
             prev = word
         return prob
         # return 2**prob
 
-    def test_with_addK(self, k, review):
+    def test_with_Ksmoothing(self, k, review):
         prob = 0
         prev = '.'
         for word in review:
-            if word not in self.dict1:
+            if word not in self.uni_dict:
                 word = '/unk'
-            if prev not in self.dict1:
+            if prev not in self.uni_dict:
                 prev = '/unk'
 
-            # print(prev + word)
-            if prev + word in self.dict2:
+
+            if prev + word in self.bi_dict:
                 # print(prev + word)
-                prob += math.log((self.dict2[prev + word] + k) / (self.dict1[word] + k * len(self.dict1)), 2)
-                # print(prob)
+                prob += math.log((self.bi_dict[prev + word] + k) / (self.uni_dict[word] + k * len(self.uni_dict)), 2)
+
             else:
                 # print("-------")
                 # print(prob)
-                prob += math.log(k / (self.dict1[word] + k * len(self.dict1)), 2)
+                prob += math.log(k / (self.uni_dict[word] + k * len(self.uni_dict)), 2)
             prev = word
 
         return prob
@@ -119,27 +114,24 @@ class Bigram:
 
 class Unigram:
     def __init__(self,reviews):
-        self.dictionary = dict()
+        self.uni_dict = dict()
         self.count = 0
         self.train(reviews)
-        # print(self.dictionary)
-
-
 
     def train(self,reviews):
         for review in reviews:
             for word in review:
                 self.count += 1
                 word = word.lower()
-                if word in self.dictionary:
-                    self.dictionary[word] += 1
+                if word in self.uni_dict:
+                    self.uni_dict[word] += 1
                 else:
-                    self.dictionary[word] = 1
+                    self.uni_dict[word] = 1
 
     def test(self, review):
         prob = 0
         for word in review:
-            prob += math.log(self.dictionary[word] / self.count, 2)
+            prob += math.log(self.uni_dict[word] / self.count, 2)
         return prob
         # return 2 ** prob
 
@@ -190,8 +182,10 @@ if __name__ == '__main__':
     # create .cvs file
     test_file = 'test/test.txt'
     reviews_test = preprocess(test_file)
+    length = [len(reviews_test[i]) for i in range(len(reviews_test))]
     res1 = np.array(model_T.test_corpus(reviews_test, k))
     res2 = np.array(model_D.test_corpus(reviews_test, k))
+
     ans = [['Id', 'Prediction']]
     for i in range(len(res1)):
         if res1[i] <= res2[i]:

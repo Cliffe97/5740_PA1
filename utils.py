@@ -26,16 +26,12 @@ def preprocess(file):
             corpus.append(review)
     return corpus
 
-
+def perplexity(log_probs, lengths):
+    result =  (-log_probs)/lengths
+    return 2**result
 
 if __name__ == '__main__':
-    sen = ' a bbbb a the ffff 355555 apple thebook'
-    sen = re.sub(r'\d',' ',sen)
-    # sen = re.sub('  ', ' ', sen)
-    print(sen)
-    stemmer = EnglishStemmer()
-    a = ['aaa', 'bbb']
-    for i in range(len(a)):
-        a[i] = 'vvv'
-
-    print(a)
+    import numpy as np
+    a = np.array([2,2,2,2]).reshape((4,1))
+    b = np.array([1, 1, 1, 1]).reshape((4,1))
+    print(perplexity(a,b))
