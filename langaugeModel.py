@@ -168,8 +168,6 @@ if __name__ == '__main__':
     res1 = np.array(model_T.test_corpus(reviews_test, k))
     res2 = np.array(model_D.test_corpus(reviews_test, k))
 
-    # print(res1)
-    # print(res2)
     ans = res1 > res2
     unique_elements, counts_elements = np.unique(ans, return_counts=True)
     print("testing truthful.txt")
@@ -183,8 +181,6 @@ if __name__ == '__main__':
     res1 = np.array(model_T.test_corpus(reviews_test,k))
     res2 = np.array(model_D.test_corpus(reviews_test,k))
 
-    # print(res1)
-    # print(res2)
     ans = res1 > res2
     unique_elements, counts_elements = np.unique(ans, return_counts=True)
     print("\ntesting deceptive.txt")
