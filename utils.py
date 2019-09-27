@@ -3,7 +3,7 @@ import nltk
 
 START_SYMBOL = '<s>'
 
-def read_preprocess(file):
+def preprocess(file):
     corpus = []
     with open(file,'r') as f:
         for review in f:
@@ -19,6 +19,8 @@ def read_preprocess(file):
             review = re.sub(' ? ', ' ? '+START_SYMBOL+' ', review)
             review = re.sub(' ! ', ' ! ' + START_SYMBOL + ' ', review)
             review = re.sub(' . ', ' . ' + START_SYMBOL + ' ', review)
+            review = review.split()
+            for word 
 
 
 
