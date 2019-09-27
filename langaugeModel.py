@@ -106,7 +106,10 @@ class Bigram:
             if prev + word in self.dict2:
                 # print(prev + word)
                 prob += math.log((self.dict2[prev + word] + k) / (self.dict1[word] + k * len(self.dict1)), 2)
+                print(prob)
             else:
+                print("-------")
+                print(prob)
                 prob += math.log(k / (self.dict1[word] + k * len(self.dict1)), 2)
             prev = word
 
