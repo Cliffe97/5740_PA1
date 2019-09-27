@@ -1,3 +1,4 @@
+import csv
 import math
 import operator
 import numpy as np
@@ -162,7 +163,7 @@ if __name__ == '__main__':
     # model_T.train_with_topM(reviews_T, m)
     # model_D.train_with_topM(reviews_D, m)
 
-    k=0.01
+    k = 0.01
     # TESTING against truthful.txt
     test_file = 'validation/truthful.txt'
     reviews_test = preprocess(test_file)
@@ -184,3 +185,22 @@ if __name__ == '__main__':
     print("\ntesting deceptive.txt")
     print(unique_elements)
     print(counts_elements)
+
+
+    # create .cvs file
+    test_file = 'test/test.txt'
+    reviews_test = preprocess(test_file)
+    res1 = np.array(model_T.test_corpus(reviews_test, k))
+    res2 = np.array(model_D.test_corpus(reviews_test, k))
+    ans = [['Id', 'Prediction']]
+    for i in range(len(res1)):
+        if res1[i] <= res2[i]:
+            ans.append([i, 1])
+        else:
+            ans.append([i, 0])
+    # print(ans)
+    # print(len(ans))
+    with open('prediction.csv', 'w') as csvFile:
+        writer = csv.writer(csvFile)
+        writer.writerows(ans)
+    csvFile.close()
