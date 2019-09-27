@@ -161,8 +161,22 @@ if __name__ == '__main__':
     # model_D.train_with_topM(reviews_D, m)
 
 
-    # TESTING
+    # TESTING against truthful.txt
     test_file = 'validation/truthful.txt'
+    reviews_test = preprocess(test_file)
+    k = 0.01
+    res1 = np.array(model_T.test_corpus(reviews_test, k))
+    res2 = np.array(model_D.test_corpus(reviews_test, k))
+
+    # print(res1)
+    # print(res2)
+    ans = res1 > res2
+    unique_elements, counts_elements = np.unique(ans, return_counts=True)
+    print("testing truthful.txt")
+    print(unique_elements)
+    print(counts_elements)
+
+    # TESTING against deceptive.txt
     test_file = 'validation/deceptive.txt'
     reviews_test = preprocess(test_file)
     k = 0.01
@@ -173,5 +187,6 @@ if __name__ == '__main__':
     # print(res2)
     ans = res1 > res2
     unique_elements, counts_elements = np.unique(ans, return_counts=True)
+    print("\ntesting deceptive.txt")
     print(unique_elements)
     print(counts_elements)
