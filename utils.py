@@ -1,9 +1,10 @@
 import re
-import nltk
+from nltk.stem.snowball import EnglishStemmer
 
 START_SYMBOL = '<s>'
 
 def preprocess(file):
+    stemmer = EnglishStemmer()
     corpus = []
     with open(file,'r') as f:
         for review in f:
@@ -20,7 +21,10 @@ def preprocess(file):
             review = re.sub(' ! ', ' ! ' + START_SYMBOL + ' ', review)
             review = re.sub(' . ', ' . ' + START_SYMBOL + ' ', review)
             review = review.split()
-            for word 
+            for i in range(len(review)):
+                review[i] = stemmer.stem(review[i])
+            corpus.append(review)
+    return corpus
 
 
 
@@ -29,8 +33,9 @@ if __name__ == '__main__':
     sen = re.sub(r'\d',' ',sen)
     # sen = re.sub('  ', ' ', sen)
     print(sen)
-    sen = sen.split()
-    # sen = re.sub(' the ', ' ', sen)
-    # sen = re.sub(r'\number', '', sen)
-    # sen = re.sub(' the ', '', sen)
-    print(sen)
+    stemmer = EnglishStemmer()
+    a = ['aaa', 'bbb']
+    for i in range(len(a)):
+        a[i] = 'vvv'
+
+    print(a)

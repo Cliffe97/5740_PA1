@@ -106,10 +106,10 @@ class Bigram:
             if prev + word in self.dict2:
                 # print(prev + word)
                 prob += math.log((self.dict2[prev + word] + k) / (self.dict1[word] + k * len(self.dict1)), 2)
-                print(prob)
+                # print(prob)
             else:
-                print("-------")
-                print(prob)
+                # print("-------")
+                # print(prob)
                 prob += math.log(k / (self.dict1[word] + k * len(self.dict1)), 2)
             prev = word
 
@@ -162,11 +162,10 @@ if __name__ == '__main__':
     # model_T.train_with_topM(reviews_T, m)
     # model_D.train_with_topM(reviews_D, m)
 
-
+    k=0.01
     # TESTING against truthful.txt
     test_file = 'validation/truthful.txt'
     reviews_test = preprocess(test_file)
-    k = 0.01
     res1 = np.array(model_T.test_corpus(reviews_test, k))
     res2 = np.array(model_D.test_corpus(reviews_test, k))
     ans = res1 > res2
@@ -178,7 +177,6 @@ if __name__ == '__main__':
     # TESTING against deceptive.txt
     test_file = 'validation/deceptive.txt'
     reviews_test = preprocess(test_file)
-    k = 0.01
     res1 = np.array(model_T.test_corpus(reviews_test,k))
     res2 = np.array(model_D.test_corpus(reviews_test,k))
     ans = res1 > res2
