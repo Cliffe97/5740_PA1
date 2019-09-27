@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c5a8aa16-a5f7-4b9d-970e-a1795a723f93" name="Default Changelist" comment="">
+    <list default="true" id="c5a8aa16-a5f7-4b9d-970e-a1795a723f93" name="Default Changelist" comment="corresponding individual tests">
       <change beforePath="$PROJECT_DIR$/langaugeModel.py" beforeDir="false" afterPath="$PROJECT_DIR$/langaugeModel.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -223,7 +223,28 @@
       <option name="project" value="LOCAL" />
       <updated>1569614373589</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="addk smoothing">
+      <created>1569614724971</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1569614724971</updated>
+    </task>
+    <task id="LOCAL-00013" summary="addk smoothing">
+      <created>1569614786598</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1569614786598</updated>
+    </task>
+    <task id="LOCAL-00014" summary="corresponding individual tests">
+      <created>1569614874022</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1569614874022</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -247,6 +268,7 @@
     <MESSAGE value="create languageModel" />
     <MESSAGE value="implementation of uni and bigram" />
     <MESSAGE value="addk smoothing" />
-    <option name="LAST_COMMIT_MESSAGE" value="addk smoothing" />
+    <MESSAGE value="corresponding individual tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="corresponding individual tests" />
   </component>
 </project>

@@ -140,7 +140,6 @@ class Unigram:
         # return 2 ** prob
 
 
-
 if __name__ == '__main__':
 
     # TRAINING
