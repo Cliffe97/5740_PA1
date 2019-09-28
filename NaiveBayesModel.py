@@ -5,6 +5,8 @@ import operator
 import numpy as np
 from utils import preprocess
 
+
+
 class NaiveBayes:
     def __init__(self):
 
