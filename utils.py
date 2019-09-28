@@ -32,68 +32,8 @@ def perplexity(log_probs, lengths):
     return 2**result
 
 
-class NB_Preprocessor:
-    def __init__(self):
-        self.wordtype_dict = dict()
-        self.count = 0
-        self.stemmer = EnglishStemmer()
-
-    def preprocess_train(self,truth_file, decp_file):
-        normalized_text = self.__setup_vocabulary(truth_file,decp_file)
-        train_X = []
-        train_Y = []
-        for i in range(len(normalized_text)):
-            for review in normalized_text[i]:
-                x = [0]* (self.count)
-                for word in review:
-                    x[self.wordtype_dict[word]]+=1
-                train_X.append(x)
-                train_Y.append(i)
-
-        return train_X, train_Y
-
-    def preprocess_test(self,test_file):
-        test_X = []
-        with open(test_file,'r') as file:
-            for review in file:
-                x = [0]*self.count
-                review = review.lower()
-                review = review.split()
-                for word in review:
-                    word = self.stemmer.stem(word)
-                    if word in self.wordtype_dict:
-                        x[self.wordtype_dict[word]] += 1
-                test_X.append(x)
-        return test_X
-
-    def __setup_vocabulary(self, truth_file, decp_file):
-        filenames = [truth_file, decp_file]
-        normalized_text = []
-        for filename in filenames:
-            data = []
-            with open(filename, 'r') as file:
-                for review in file:
-                    record = []
-                    review = review.lower()
-                    review = review.split()
-                    for word in review:
-                        word = self.stemmer.stem(word)
-                        record.append(word)
-                        if word not in self.wordtype_dict:
-                            self.wordtype_dict[word] = self.count
-                            self.count += 1
-                    data.append(record)
-            normalized_text.append(data)
-        # print(self.wordtype_dict)
-        return normalized_text
-
-
 
 
 
 if __name__ == '__main__':
-    prepro = NB_Preprocessor()
-    train_X, train_Y =prepro.preprocess_train('train/truthful.txt', 'train/deceptive.txt')
-    print(train_Y)
-    import numpy as np
-    print(np.array(train_X))
+    pass

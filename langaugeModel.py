@@ -2,7 +2,8 @@ import csv
 import math
 import operator
 import numpy as np
-from utils import preprocess
+from utils import lm_preprocess
+from utils import perplexity
 
 UNKNOWN_SYMBOL = '/unk'
 START_SYMBOL = '<s>'
@@ -24,6 +25,7 @@ class Bigram:
 
                 prev = word
 
+    # we treat the first occurrence of each word type as unknown
     def train_with_first_OOV(self, reviews):
         self.uni_dict[UNKNOWN_SYMBOL] = 0
 
@@ -40,7 +42,7 @@ class Bigram:
                     self.bi_dict[(prev, word)] = self.bi_dict.get((prev, word), 0) + 1
                 prev = word
 
-
+    # we only keep top M most frequent word types and treat every other word as unknown
     def train_with_topM(self, reviews, M):
         for review in reviews:
             for word in review:
@@ -135,29 +137,32 @@ if __name__ == '__main__':
     # TRAINING
     train_file_T = 'train/truthful.txt'
     train_file_D = 'train/deceptive.txt'
-    reviews_T = preprocess(train_file_T)
-    reviews_D = preprocess(train_file_D)
+    reviews_T = lm_preprocess(train_file_T)
+    reviews_D = lm_preprocess(train_file_D)
     model_T = Bigram()
     model_D = Bigram()
 
     # train option 1
-    model_T.train_with_first_OOV(reviews_T)
-    model_D.train_with_first_OOV(reviews_D)
+    model_T.train_with_topM(reviews_T, 200)
+    model_D.train_with_topM(reviews_D, 200)
 
     # # train option 2
     # m = 2000
     # model_T.train_with_topM(reviews_T, m)
     # model_D.train_with_topM(reviews_D, m)
 
-    k = 0.01
+    k = 1
     # TESTING against truthful.txt
     test_file = 'validation/truthful.txt'
-    reviews_test = preprocess(test_file)
+    reviews_test = lm_preprocess(test_file)
     res1 = np.array(model_T.test_corpus(reviews_test, k))
     res2 = np.array(model_D.test_corpus(reviews_test, k))
-    print(res1)
-    print(res2)
-    ans = res1 > res2
+    lengths = np.array([len(reviews_test[i]) for i in range(len(reviews_test))])
+    per1 = perplexity(res1, lengths)
+    per2 = perplexity(res2, lengths)
+    print(per1)
+    print(per2)
+    ans = per1 < per2
     unique_elements, counts_elements = np.unique(ans, return_counts=True)
     print("testing truthful.txt")
     print(unique_elements)
