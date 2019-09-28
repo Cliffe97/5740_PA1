@@ -56,10 +56,17 @@ class NB_Preprocessor:
         test_X = []
         with open(test_file,'r') as file:
             for review in file:
-                x
+                x = [0]*self.count
+                review = review.lower()
+                review = review.split()
+                for word in review:
+                    word = self.stemmer.stem(word)
+                    if word in self.wordtype_dict:
+                        x[self.wordtype_dict[word]] += 1
+                test_X.append(x)
+        return test_X
 
     def __setup_vocabulary(self, truth_file, decp_file):
-        stemmer = EnglishStemmer()
         filenames = [truth_file, decp_file]
         normalized_text = []
         for filename in filenames:
@@ -70,7 +77,7 @@ class NB_Preprocessor:
                     review = review.lower()
                     review = review.split()
                     for word in review:
-                        word = stemmer.stem(word)
+                        word = self.stemmer.stem(word)
                         record.append(word)
                         if word not in self.wordtype_dict:
                             self.wordtype_dict[word] = self.count
