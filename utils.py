@@ -36,23 +36,27 @@ class NB_Preprocessor:
     def __init__(self):
         self.wordtype_dict = dict()
         self.count = 0
+        self.stemmer = EnglishStemmer()
 
     def preprocess_train(self,truth_file, decp_file):
         normalized_text = self.__setup_vocabulary(truth_file,decp_file)
         train_X = []
         train_Y = []
         for i in range(len(normalized_text)):
-            for data in normalized_text[i]:
-                for review in data:
-                    x = [0]* (self.count)
-                    for word in review:
-                        x[self.wordtype_dict[word]]+=1
-                    train_X.append(x)
-                    train_Y.append(i)
+            for review in normalized_text[i]:
+                x = [0]* (self.count)
+                for word in review:
+                    x[self.wordtype_dict[word]]+=1
+                train_X.append(x)
+                train_Y.append(i)
 
         return train_X, train_Y
 
-
+    def preprocess_test(self,test_file):
+        test_X = []
+        with open(test_file,'r') as file:
+            for review in file:
+                x
 
     def __setup_vocabulary(self, truth_file, decp_file):
         stemmer = EnglishStemmer()
@@ -73,10 +77,16 @@ class NB_Preprocessor:
                             self.count += 1
                     data.append(record)
             normalized_text.append(data)
+        # print(self.wordtype_dict)
         return normalized_text
+
+
 
 
 
 if __name__ == '__main__':
     prepro = NB_Preprocessor()
-    train_X, train_Y =
+    train_X, train_Y =prepro.preprocess_train('train/truthful.txt', 'train/deceptive.txt')
+    print(train_Y)
+    import numpy as np
+    print(np.array(train_X))
