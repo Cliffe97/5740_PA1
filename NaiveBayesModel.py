@@ -62,7 +62,7 @@ class NB_Preprocessor:
         # print(self.wordtype_dict)
         return normalized_text
 
-    def seetup_bigram_vocabulary(self, truthfile, decpfile):
+    def preprocess_bigram_train(self, truthfile, decpfile):
         # vectorizer = CountVectorizer()
         bigram_vectorizer = CountVectorizer(ngram_range=(1, 2),token_pattern=r'\b\w+\b', min_df=1)
         corpus = []
@@ -79,7 +79,7 @@ class NB_Preprocessor:
         X_2 = self.vectorizer.fit_transform(corpus).toarray()
         return X_2, train_Y
 
-    def process_test_ngram(self, testfile):
+    def process_test_bigram(self, testfile):
         corpus = []
         with open(testfile, 'r') as file:
             for review in file:
@@ -93,12 +93,13 @@ def parameter_tuning(alphas):
     valid_file_D = 'validation/deceptive.txt'
 
     prepro = NB_Preprocessor()
-    train_X, train_Y = prepro.preprocess_train(train_file_T, train_file_D)
+    train_X, train_Y = prepro.preprocess_bigram_train(train_file_T, train_file_D)
 
-    test_X_T = np.array(prepro.preprocess_test(valid_file_T))
-    test_X_D = np.array(prepro.preprocess_test(valid_file_D))
+    test_X_T = np.array(prepro.process_test_bigram(valid_file_T))
+    test_X_D = np.array(prepro.process_test_bigram(valid_file_D))
     test_X = np.vstack((test_X_T,test_X_D))
 
+    print(test_X_T)
     test_Y = [0] * test_X_T.shape[0]
     test_Y.extend([1]*test_X_D.shape[0])
     test_Y = np.array(test_Y)
@@ -123,8 +124,8 @@ def generate_test_csv(best_para):
     test_file = 'test/test.txt'
 
     prepro = NB_Preprocessor()
-    train_X, train_Y = prepro.preprocess_train(train_file_T, train_file_D)
-    test_X = np.array(prepro.preprocess_test(test_file))
+    train_X, train_Y = prepro.preprocess_bigram_train(train_file_T, train_file_D)
+    test_X = np.array(prepro.process_test_bigram(test_file))
 
     model = MultinomialNB(alpha=best_para)
     model.fit(train_X, train_Y)
@@ -134,7 +135,7 @@ def generate_test_csv(best_para):
     for i in range(len(test_Yhat)):
         ans.append([i, test_Yhat[i]])
 
-    with open('nb_prediction.csv', 'w') as csvFile:
+    with open('nb_bigram_prediction.csv', 'w') as csvFile:
         writer = csv.writer(csvFile)
         writer.writerows(ans)
     csvFile.close()
@@ -149,11 +150,17 @@ if __name__ == '__main__':
     #         fout.write(line)
     #     fin.close()
 
-    # best_para, _ = parameter_tuning([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
-    # generate_test_csv(best_para)
-    nb = NB_Preprocessor()
-
-    xtrain, ytrain = nb.seetup_bigram_vocabulary('train/truthful.txt', 'train/deceptive.txt')
-    model = MultinomialNB()
-    model.fit(xtrain, ytrain)
-    MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True)
+    best_para, _ = parameter_tuning([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+    generate_test_csv(best_para)
+    # nb = NB_Preprocessor()
+    #
+    # xtrain, ytrain = nb.seetup_bigram_vocabulary('train/truthful.txt', 'train/deceptive.txt')
+    # model = MultinomialNB()
+    # model.fit(xtrain, ytrain)
+    # MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True)
+    # test_X = nb.process_test_ngram('test/test.txt')
+    # test_Yhat = np.array(model.predict(test_X))
+    #
+    # ans = [['Id', 'Prediction']]
+    # for i in range(len(test_Yhat)):
+    #     ans.append([i, test_Yhat[i]])
