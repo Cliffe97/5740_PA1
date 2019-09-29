@@ -131,8 +131,54 @@ class Unigram:
         return prob
         # return 2 ** prob
 
+def parameter_tuning(Ms, ks):
+    train_file_T = 'train/truthful.txt'
+    train_file_D = 'train/deceptive.txt'
+    train_T = lm_preprocess(train_file_T)
+    train_D = lm_preprocess(train_file_D)
+
+    test_file_T = 'validation/truthful.txt'
+    test_file_D = 'validation/deceptive.txt'
+    test_T = lm_preprocess(test_file_T)
+    test_D = lm_preprocess(test_file_D)
+
+    lengths_T = np.array([len(test_T[i]) for i in range(len(test_T))])
+    lengths_D = np.array([len(test_D[i]) for i in range(len(test_D))])
+
+    result = {}
+    for M in Ms:
+        for k in ks:
+            model_T = Bigram()
+            model_D = Bigram()
+            model_T.train_with_topM(train_T, M)
+            model_D.train_with_topM(train_D, M)
+
+            resT_T = np.array(model_T.test_corpus(test_T, k))
+            resD_T = np.array(model_D.test_corpus(test_T, k))
+            perT_T = perplexity(resT_T, lengths_T)
+            perD_T = perplexity(resD_T, lengths_T)
+
+            num_correct_T = np.sum(perT_T <= perD_T)
+
+            resT_D = np.array(model_T.test_corpus(test_D, k))
+            resD_D = np.array(model_D.test_corpus(test_D, k))
+            perT_D = perplexity(resT_D, lengths_D)
+            perD_D = perplexity(resD_D, lengths_D)
+
+            num_correct_D = np.sum(perT_D >= perD_D)
+
+            accuracy = (num_correct_T + num_correct_D) / (len(test_T)+len(test_D))
+            result[(M,k)] = accuracy
+
+    items = sorted(result.items(), key=operator.itemgetter(1))
+    print(items)
+
+    return items[-1]
+
+
 
 if __name__ == '__main__':
+    # best_par, _ = parameter_tuning([200], [0.001])
 
     # TRAINING
     train_file_T = 'train/truthful.txt'

@@ -1,6 +1,9 @@
 import numpy as np
+import operator
 from nltk.stem.snowball import EnglishStemmer
 from sklearn.naive_bayes import MultinomialNB
+import fileinput
+import csv
 
 class NB_Preprocessor:
     def __init__(self):
@@ -57,32 +60,71 @@ class NB_Preprocessor:
         # print(self.wordtype_dict)
         return normalized_text
 
-if __name__ == '__main__':
 
+def parameter_tuning(alphas):
     train_file_T = 'train/truthful.txt'
     train_file_D = 'train/deceptive.txt'
     valid_file_T = 'validation/truthful.txt'
     valid_file_D = 'validation/deceptive.txt'
+
     prepro = NB_Preprocessor()
     train_X, train_Y = prepro.preprocess_train(train_file_T, train_file_D)
-    model = MultinomialNB()
+
+    test_X_T = np.array(prepro.preprocess_test(valid_file_T))
+    test_X_D = np.array(prepro.preprocess_test(valid_file_D))
+    test_X = np.vstack((test_X_T,test_X_D))
+
+    test_Y = [0] * test_X_T.shape[0]
+    test_Y.extend([1]*test_X_D.shape[0])
+    test_Y = np.array(test_Y)
+
+    result = {}
+    for alpha in alphas:
+        model = MultinomialNB(alpha = alpha)
+        model.fit(train_X, train_Y)
+        test_Yhat = np.array(model.predict(test_X))
+        num_correct = np.sum(test_Yhat == test_Y)
+        accuracy = num_correct/len(test_Yhat)
+        result[alpha] = accuracy
+
+    items = sorted(result.items(), key=operator.itemgetter(1))
+    print(items)
+
+    return items[-1]
+
+def generate_test_csv(best_para):
+    train_file_T = 'train/truthful.txt'
+    train_file_D = 'train/deceptive.txt'
+    test_file = 'test/test.txt'
+
+    prepro = NB_Preprocessor()
+    train_X, train_Y = prepro.preprocess_train(train_file_T, train_file_D)
+    test_X = np.array(prepro.preprocess_test(test_file))
+
+    model = MultinomialNB(alpha=best_para)
     model.fit(train_X, train_Y)
-    test_Y_T = prepro.preprocess_test(valid_file_T)
-    test_Y_D = prepro.preprocess_test(valid_file_D)
-    res_T = model.predict(test_Y_T)
-    unique_elements, counts_elements = np.unique(res_T == 0, return_counts=True)
-    print("testing truthful.txt")
-    print(unique_elements)
-    print(counts_elements)
+    test_Yhat = np.array(model.predict(test_X))
 
-    res_D = model.predict(test_Y_D)
-    unique_elements, counts_elements = np.unique(res_D == 1, return_counts=True)
-    print("testing truthful.txt")
-    print(unique_elements)
-    print(counts_elements)
+    ans = [['Id', 'Prediction']]
+    for i in range(len(test_Yhat)):
+        ans.append([i, test_Yhat[i]])
+
+    with open('nb_prediction.csv', 'w') as csvFile:
+        writer = csv.writer(csvFile)
+        writer.writerows(ans)
+    csvFile.close()
 
 
+if __name__ == '__main__':
 
+    # filenames = ['train/deceptive.txt', 'validation/deceptive.txt']
+    # with open('train_valid/new_deceptive.txt', 'w') as fout:
+    #     fin = fileinput.input(filenames)
+    #     for line in fin:
+    #         fout.write(line)
+    #     fin.close()
 
+    best_para, _ = parameter_tuning([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+    generate_test_csv(best_para)
 
 
