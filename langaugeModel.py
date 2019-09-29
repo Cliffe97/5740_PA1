@@ -113,6 +113,7 @@ class Unigram:
         self.uni_dict = dict()
         self.count = 0
         self.train(reviews)
+        self.uni_dict[UNKNOWN_SYMBOL] = 0
 
     def train(self,reviews):
         for review in reviews:
@@ -123,6 +124,28 @@ class Unigram:
                     self.uni_dict[word] += 1
                 else:
                     self.uni_dict[word] = 1
+
+    def train_with_first_OOV(self, reviews):
+        for review in reviews:
+            for word in review:
+                if word in self.uni_dict:
+                    self.uni_dict[word] += 1
+                else:
+                    self.uni_dict[word] = 0
+                    self.uni_dict[UNKNOWN_SYMBOL] += 1
+
+    def train_with_topM(self, reviews, M):
+        for review in reviews:
+            for word in review:
+                if word in self.uni_dict:
+                    self.uni_dict[word] = self.uni_dict.get(word, 0)+1
+
+        items = sorted(self.uni_dict.items(), key=operator.itemgetter(1))
+        disposed = items[M:]
+        for key, value in disposed:
+            self.uni_dict[UNKNOWN_SYMBOL] += disposed[key]
+            del self.uni_dict[key]
+
 
     def test(self, review):
         prob = 0
