@@ -62,19 +62,29 @@ class NB_Preprocessor:
         # print(self.wordtype_dict)
         return normalized_text
 
-    def seetup_bigram_vocabulary(self, file):
+    def seetup_bigram_vocabulary(self, truthfile, decpfile):
         # vectorizer = CountVectorizer()
         bigram_vectorizer = CountVectorizer(ngram_range=(1, 2),token_pattern=r'\b\w+\b', min_df=1)
         corpus = []
-        with open(file, 'r') as file:
+        with open(truthfile, 'r') as file:
             for review in file:
                 corpus.append(review)
-        X_2 = bigram_vectorizer.fit_transform(corpus).toarray()
-        return X_2
+        train_Y = [0] * len(corpus)
+        with open(decpfile, 'r') as file:
+            for review in file:
+                corpus.append(review)
 
+        train_Y.extend([1] * (len(corpus)-len(train_Y)))
+        self.vectorizer = bigram_vectorizer
+        X_2 = self.vectorizer.fit_transform(corpus).toarray()
+        return X_2, train_Y
 
-
-
+    def process_test_ngram(self, testfile):
+        corpus = []
+        with open(testfile, 'r') as file:
+            for review in file:
+                corpus.append(review)
+        return self.vectorizer.transform(corpus)
 
 def parameter_tuning(alphas):
     train_file_T = 'train/truthful.txt'
@@ -142,6 +152,8 @@ if __name__ == '__main__':
     # best_para, _ = parameter_tuning([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
     # generate_test_csv(best_para)
     nb = NB_Preprocessor()
-    nb.seetup_ngram_vocabulary('train/truthful.txt', 'train/deceptive.txt',6)
 
-
+    xtrain, ytrain = nb.seetup_bigram_vocabulary('train/truthful.txt', 'train/deceptive.txt')
+    model = MultinomialNB()
+    model.fit(xtrain, ytrain)
+    MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True)
