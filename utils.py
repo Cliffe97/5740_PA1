@@ -3,11 +3,12 @@ from nltk.stem.snowball import EnglishStemmer
 
 START_SYMBOL = '<s>'
 
-def preprocess(file):
+def lm_preprocess(file):
     stemmer = EnglishStemmer()
     corpus = []
     with open(file,'r') as f:
         for review in f:
+            review = review.lower()
             review = START_SYMBOL +' '+ review
             review = re.sub(' a ', ' ', review)
             review = re.sub(' an ', ' ', review)
@@ -17,9 +18,9 @@ def preprocess(file):
             review = re.sub(' was ', ' ', review)
             review = re.sub(' were ', ' ', review)
             review = re.sub('-', ' ', review)
-            review = re.sub(' ? ', ' ? '+START_SYMBOL+' ', review)
+            review = re.sub(' \? ', ' ? '+START_SYMBOL+' ', review)
             review = re.sub(' ! ', ' ! ' + START_SYMBOL + ' ', review)
-            review = re.sub(' . ', ' . ' + START_SYMBOL + ' ', review)
+            review = re.sub(' \. ', ' . ' + START_SYMBOL + ' ', review)
             review = review.split()
             for i in range(len(review)):
                 review[i] = stemmer.stem(review[i])
@@ -27,19 +28,12 @@ def preprocess(file):
     return corpus
 
 def perplexity(log_probs, lengths):
-    result = (-log_probs)/lengths
+    result =  (-log_probs)/lengths
     return 2**result
 
 
 
-if __name__ == '__main__':
-    sen = ' a bbbb a the ffff 355555 apple thebook'
-    sen = re.sub(r'\d',' ',sen)
-    # sen = re.sub('  ', ' ', sen)
-    print(sen)
-    stemmer = EnglishStemmer()
-    a = ['aaa', 'bbb']
-    for i in range(len(a)):
-        a[i] = 'vvv'
 
-    print(a)
+
+if __name__ == '__main__':
+    pass
