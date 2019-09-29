@@ -2,6 +2,8 @@ import numpy as np
 import operator
 from nltk.stem.snowball import EnglishStemmer
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.feature_extraction.text import CountVectorizer
+from utils import lm_preprocess
 import fileinput
 import csv
 
@@ -59,6 +61,19 @@ class NB_Preprocessor:
             normalized_text.append(data)
         # print(self.wordtype_dict)
         return normalized_text
+
+    def seetup_bigram_vocabulary(self, file):
+        # vectorizer = CountVectorizer()
+        bigram_vectorizer = CountVectorizer(ngram_range=(1, 2),token_pattern=r'\b\w+\b', min_df=1)
+        corpus = []
+        with open(file, 'r') as file:
+            for review in file:
+                corpus.append(review)
+        X_2 = bigram_vectorizer.fit_transform(corpus).toarray()
+        return X_2
+
+
+
 
 
 def parameter_tuning(alphas):
@@ -124,7 +139,9 @@ if __name__ == '__main__':
     #         fout.write(line)
     #     fin.close()
 
-    best_para, _ = parameter_tuning([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
-    generate_test_csv(best_para)
+    # best_para, _ = parameter_tuning([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+    # generate_test_csv(best_para)
+    nb = NB_Preprocessor()
+    nb.seetup_ngram_vocabulary('train/truthful.txt', 'train/deceptive.txt',6)
 
 
