@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from utils import lm_preprocess
 import fileinput
 import csv
+import matplotlib.pylab as plt
 
 class NB_Preprocessor:
     def __init__(self):
@@ -62,9 +63,9 @@ class NB_Preprocessor:
         # print(self.wordtype_dict)
         return normalized_text
 
-    def preprocess_bigram_train(self, truthfile, decpfile):
+    def preprocess_ngram_train(self, truthfile, decpfile, n):
         # vectorizer = CountVectorizer()
-        bigram_vectorizer = CountVectorizer(ngram_range=(1, 2),token_pattern=r'\b\w+\b', min_df=1)
+        self.vectorizer = CountVectorizer(ngram_range=(1, n),token_pattern=r'\b\w+\b', min_df=1)
         corpus = []
         with open(truthfile, 'r') as file:
             for review in file:
@@ -75,16 +76,17 @@ class NB_Preprocessor:
                 corpus.append(review)
 
         train_Y.extend([1] * (len(corpus)-len(train_Y)))
-        self.vectorizer = bigram_vectorizer
         X_2 = self.vectorizer.fit_transform(corpus).toarray()
+        # print(type(X_2))
         return X_2, train_Y
 
-    def process_test_bigram(self, testfile):
+    def preprocess_ngram_test(self, testfile):
         corpus = []
         with open(testfile, 'r') as file:
             for review in file:
                 corpus.append(review)
-        return self.vectorizer.transform(corpus)
+        test_X = self.vectorizer.transform(corpus)
+        return test_X.toarray()
 
 def parameter_tuning(alphas):
     train_file_T = 'train/truthful.txt'
@@ -93,15 +95,14 @@ def parameter_tuning(alphas):
     valid_file_D = 'validation/deceptive.txt'
 
     prepro = NB_Preprocessor()
-    train_X, train_Y = prepro.preprocess_bigram_train(train_file_T, train_file_D)
+    train_X, train_Y = prepro.preprocess_ngram_train(train_file_T, train_file_D,3)
 
-    test_X_T = np.array(prepro.process_test_bigram(valid_file_T))
-    test_X_D = np.array(prepro.process_test_bigram(valid_file_D))
+    test_X_T = np.array(prepro.preprocess_ngram_test(valid_file_T))
+    test_X_D = np.array(prepro.preprocess_ngram_test(valid_file_D))
     test_X = np.vstack((test_X_T,test_X_D))
 
-    print(test_X_T)
-    test_Y = [0] * test_X_T.shape[0]
-    test_Y.extend([1]*test_X_D.shape[0])
+    test_Y = [0] * len(test_X_T)
+    test_Y.extend([1]*len(test_X_D))
     test_Y = np.array(test_Y)
 
     result = {}
@@ -116,6 +117,12 @@ def parameter_tuning(alphas):
     items = sorted(result.items(), key=operator.itemgetter(1))
     print(items)
 
+    # x, y = zip(*result.items())  # unpack a list of pairs into two tuples
+    # plt.xlabel('Smoothing parameter: alpha')
+    # plt.ylabel('Accuracy')
+    # plt.scatter(x, y)
+    # plt.show()
+
     return items[-1]
 
 def generate_test_csv(best_para):
@@ -124,8 +131,8 @@ def generate_test_csv(best_para):
     test_file = 'test/test.txt'
 
     prepro = NB_Preprocessor()
-    train_X, train_Y = prepro.preprocess_bigram_train(train_file_T, train_file_D)
-    test_X = np.array(prepro.process_test_bigram(test_file))
+    train_X, train_Y = prepro.preprocess_ngram_train(train_file_T, train_file_D,3)
+    test_X = np.array(prepro.preprocess_ngram_test(test_file))
 
     model = MultinomialNB(alpha=best_para)
     model.fit(train_X, train_Y)
@@ -150,7 +157,7 @@ if __name__ == '__main__':
     #         fout.write(line)
     #     fin.close()
 
-    best_para, _ = parameter_tuning([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+    best_para, _ = parameter_tuning([0.05,0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1])
     generate_test_csv(best_para)
     # nb = NB_Preprocessor()
     #

@@ -2,7 +2,7 @@ import csv
 import math
 import operator
 import numpy as np
-from utils import lm_preprocess
+from utils import simple_preprocess
 from utils import perplexity
 
 UNKNOWN_SYMBOL = '/unk'
@@ -50,7 +50,10 @@ class Bigram:
 
         # select top M items to remain in word dictionary
         items = sorted(self.uni_dict.items(), key=operator.itemgetter(1))
-        disposed = items[M:]
+        print(items)
+        M = int(len(items) * (1-M))
+        disposed = items[:M]
+        print(disposed)
         self.uni_dict[UNKNOWN_SYMBOL] = 0
         for key, value in disposed:
             self.uni_dict[UNKNOWN_SYMBOL] += value
@@ -109,10 +112,10 @@ class Bigram:
         # return 2 ** prob
 
 class Unigram:
-    def __init__(self,reviews):
+    def __init__(self):
         self.uni_dict = dict()
         self.count = 0
-        self.train(reviews)
+        # self.train(reviews)
         self.uni_dict[UNKNOWN_SYMBOL] = 0
 
     def train(self,reviews):
@@ -137,13 +140,13 @@ class Unigram:
     def train_with_topM(self, reviews, M):
         for review in reviews:
             for word in review:
-                if word in self.uni_dict:
-                    self.uni_dict[word] = self.uni_dict.get(word, 0)+1
+                self.uni_dict[word] = self.uni_dict.get(word, 0)+1
 
+        # print(len(self.uni_dict))
         items = sorted(self.uni_dict.items(), key=operator.itemgetter(1))
         disposed = items[M:]
         for key, value in disposed:
-            self.uni_dict[UNKNOWN_SYMBOL] += disposed[key]
+            self.uni_dict[UNKNOWN_SYMBOL] += value
             del self.uni_dict[key]
 
 
@@ -154,76 +157,113 @@ class Unigram:
         return prob
         # return 2 ** prob
 
-def parameter_tuning(Ms, ks):
+def parameter_tuning(ks):
     train_file_T = 'train/truthful.txt'
     train_file_D = 'train/deceptive.txt'
-    train_T = lm_preprocess(train_file_T)
-    train_D = lm_preprocess(train_file_D)
+    train_T = simple_preprocess(train_file_T)
+    train_D = simple_preprocess(train_file_D)
 
     test_file_T = 'validation/truthful.txt'
     test_file_D = 'validation/deceptive.txt'
-    test_T = lm_preprocess(test_file_T)
-    test_D = lm_preprocess(test_file_D)
+    test_T = simple_preprocess(test_file_T)
+    test_D = simple_preprocess(test_file_D)
 
     lengths_T = np.array([len(test_T[i]) for i in range(len(test_T))])
     lengths_D = np.array([len(test_D[i]) for i in range(len(test_D))])
 
     result = {}
-    for M in Ms:
-        for k in ks:
-            model_T = Bigram()
-            model_D = Bigram()
-            model_T.train_with_topM(train_T, M)
-            model_D.train_with_topM(train_D, M)
+    # for M in Ms:
+    for k in ks:
+        model_T = Bigram()
+        model_D = Bigram()
+        model_T.train_with_first_OOV(train_T)
+        model_D.train_with_first_OOV(train_D)
 
-            resT_T = np.array(model_T.test_corpus(test_T, k))
-            resD_T = np.array(model_D.test_corpus(test_T, k))
-            perT_T = perplexity(resT_T, lengths_T)
-            perD_T = perplexity(resD_T, lengths_T)
+        resT_T = np.array(model_T.test_corpus(test_T, k))
+        resD_T = np.array(model_D.test_corpus(test_T, k))
+        perT_T = perplexity(resT_T, lengths_T)
+        perD_T = perplexity(resD_T, lengths_T)
+        # print(perT_T < perD_T)
+        num_correct_T = np.sum(perT_T < perD_T)
 
-            num_correct_T = np.sum(perT_T <= perD_T)
+        resT_D = np.array(model_T.test_corpus(test_D, k))
+        resD_D = np.array(model_D.test_corpus(test_D, k))
+        perT_D = perplexity(resT_D, lengths_D)
+        perD_D = perplexity(resD_D, lengths_D)
+        # print(perT_D > perD_D)
+        num_correct_D = np.sum(perT_D >= perD_D)
 
-            resT_D = np.array(model_T.test_corpus(test_D, k))
-            resD_D = np.array(model_D.test_corpus(test_D, k))
-            perT_D = perplexity(resT_D, lengths_D)
-            perD_D = perplexity(resD_D, lengths_D)
-
-            num_correct_D = np.sum(perT_D >= perD_D)
-
-            accuracy = (num_correct_T + num_correct_D) / (len(test_T)+len(test_D))
-            result[(M,k)] = accuracy
+        accuracy = (num_correct_T + num_correct_D) / (len(test_T)+len(test_D))
+        result[k] = accuracy
 
     items = sorted(result.items(), key=operator.itemgetter(1))
     print(items)
 
     return items[-1]
 
+def generate_test_csv(best_para):
+    train_file_T = 'train/truthful.txt'
+    train_file_D = 'train/deceptive.txt'
+    test_file = 'test/test.txt'
+
+    train_T = lm_preprocess(train_file_T)
+    train_D = lm_preprocess(train_file_D)
+    test = lm_preprocess(test_file)
+
+    model_T = Bigram()
+    model_D = Bigram()
+    model_T.train_with_first_OOV(train_T)
+    model_D.train_with_first_OOV(train_D)
+    length = np.array([len(test[i]) for i in range(len(test))])
+
+    resT = np.array(model_T.test_corpus(test, best_para))
+    resD = np.array(model_D.test_corpus(test, best_para))
+
+    perT = perplexity(resT, length)
+    perD = perplexity(resD, length)
+
+
+
+
+    ans = [['Id', 'Prediction']]
+    for i in range(len(test)):
+        if perT[i] < perD[i]:
+            ans.append([i, 0])
+        else:
+            ans.append([i, 1])
+
+    with open('lm_prediction.csv', 'w') as csvFile:
+        writer = csv.writer(csvFile)
+        writer.writerows(ans)
+    csvFile.close()
 
 
 if __name__ == '__main__':
-    # best_par, _ = parameter_tuning([200], [0.001])
+    # best_par, _ = parameter_tuning([0.005, 0.01, 0.015,0.02])
+    # generate_test_csv(best_par)
+
 
     # TRAINING
     train_file_T = 'train/truthful.txt'
     train_file_D = 'train/deceptive.txt'
-    reviews_T = lm_preprocess(train_file_T)
-    reviews_D = lm_preprocess(train_file_D)
+    reviews_T = simple_preprocess(train_file_T)
+    reviews_D = simple_preprocess(train_file_D)
+
     model_T = Bigram()
     model_D = Bigram()
 
     # train option 1
-    model_T.train_with_topM(reviews_T, 200)
-    model_D.train_with_topM(reviews_D, 200)
+    model_T.train_with_topM(reviews_T, 1)
+    model_D.train_with_topM(reviews_D, 1)
 
-    # # train option 2
-    # m = 2000
-    # model_T.train_with_topM(reviews_T, m)
+    # train option 2
+    # model_T.train_with_topM(reviews_T)
     # model_D.train_with_topM(reviews_D, m)
 
     k = 1
     # TESTING against truthful.txt
     test_file = 'validation/truthful.txt'
-    reviews_test = lm_preprocess(test_file)
+    reviews_test = simple_preprocess(test_file)
     res1 = np.array(model_T.test_corpus(reviews_test, k))
     res2 = np.array(model_D.test_corpus(reviews_test, k))
     lengths = np.array([len(reviews_test[i]) for i in range(len(reviews_test))])
@@ -238,15 +278,15 @@ if __name__ == '__main__':
     print(counts_elements)
 
     # TESTING against deceptive.txt
-    # test_file = 'validation/deceptive.txt'
-    # reviews_test = preprocess(test_file)
-    # res1 = np.array(model_T.test_corpus(reviews_test,k))
-    # res2 = np.array(model_D.test_corpus(reviews_test,k))
-    # ans = res1 > res2
-    # unique_elements, counts_elements = np.unique(ans, return_counts=True)
-    # print("\ntesting deceptive.txt")
-    # print(unique_elements)
-    # print(counts_elements)
+    test_file = 'validation/deceptive.txt'
+    reviews_test = simple_preprocess(test_file)
+    res1 = np.array(model_T.test_corpus(reviews_test,k))
+    res2 = np.array(model_D.test_corpus(reviews_test,k))
+    ans = res1 > res2
+    unique_elements, counts_elements = np.unique(ans, return_counts=True)
+    print("\ntesting deceptive.txt")
+    print(unique_elements)
+    print(counts_elements)
     #
     #
     # # create .cvs file
